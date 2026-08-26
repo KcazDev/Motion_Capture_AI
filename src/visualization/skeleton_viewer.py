@@ -1,13 +1,15 @@
+import argparse
 import json
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Button
 
 
-# ---------------------------------------------------------
-# SKELETON CONNECTIONS
-# ---------------------------------------------------------
+# =========================================================
+# SKELETON DEFINITION
+# =========================================================
 
 BONES = [
     ("pelvis", "spine"),
@@ -32,50 +34,88 @@ BONES = [
 ]
 
 
-# ---------------------------------------------------------
-# LOAD MOTION
-# ---------------------------------------------------------
+# =========================================================
+# COMMAND-LINE INPUT
+# =========================================================
+
+def parse_arguments():
+    """
+    Allows a MotionAI JSON file to be supplied from the command line.
+
+    Example:
+
+    python -m src.visualization.skeleton_viewer \
+        data/samples/material_lift_001.json
+    """
+
+    parser = argparse.ArgumentParser(
+        description="RCON MotionAI 3D Motion Viewer"
+    )
+
+    parser.add_argument(
+        "motion_file",
+        nargs="?",
+        default="data/samples/material_lift_001.json",
+        help="Path to a MotionAI JSON motion file"
+    )
+
+    return parser.parse_args()
+
+
+# =========================================================
+# MOTION LOADING
+# =========================================================
 
 def load_motion(path):
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf-8") as file:
         return json.load(file)
 
 
-# ---------------------------------------------------------
+# =========================================================
 # DISPLAY HELPERS
-# ---------------------------------------------------------
+# =========================================================
 
 def format_activity(activity):
     return activity.replace("_", " ").title()
 
 
-def get_motion_phase(timestamp):
+def is_construction_lift(activity):
+    return activity == "ground_to_table_lift"
+
+
+def get_motion_phase(activity, timestamp):
+    """
+    Provides detailed phases for the construction lift.
+
+    Other motion types use a generic playback state.
+    """
+
+    if activity != "ground_to_table_lift":
+        return "MOTION PLAYBACK"
 
     if timestamp < 1.0:
         return "STANDING"
 
-    elif timestamp < 2.0:
+    if timestamp < 2.0:
         return "SQUATTING / REACHING"
 
-    elif timestamp < 3.2:
+    if timestamp < 3.2:
         return "LIFTING MATERIAL"
 
-    elif timestamp < 4.2:
+    if timestamp < 4.2:
         return "MOVING MATERIAL"
 
-    elif timestamp < 5.2:
+    if timestamp < 5.2:
         return "PLACING MATERIAL"
 
-    else:
-        return "RETURNING TO NEUTRAL"
+    return "RETURNING TO NEUTRAL"
 
 
-# ---------------------------------------------------------
+# =========================================================
 # MATERIAL BOX
-# ---------------------------------------------------------
+# =========================================================
 
 def create_box_lines(ax):
-
     lines = []
 
     for _ in range(12):
@@ -158,9 +198,32 @@ def update_box(
         )
 
 
-# ---------------------------------------------------------
-# TABLE
-# ---------------------------------------------------------
+def hide_box(box_lines):
+    for line in box_lines:
+
+        line.set_data(
+            [],
+            []
+        )
+
+        line.set_3d_properties(
+            []
+        )
+
+
+# =========================================================
+# CONSTRUCTION ENVIRONMENT
+# =========================================================
+
+def draw_ground(ax):
+
+    ax.plot(
+        [-1.0, 1.5],
+        [0.0, 0.0],
+        [0.0, 0.0],
+        linewidth=2
+    )
+
 
 def draw_table(ax):
 
@@ -172,6 +235,7 @@ def draw_table(ax):
 
     table_height = 0.82
 
+    # Table top
     surface_x = [
         table_x_start,
         table_x_end,
@@ -203,6 +267,7 @@ def draw_table(ax):
         linewidth=3
     )
 
+    # Table legs
     leg_positions = [
         (table_x_start, table_z_start),
         (table_x_end, table_z_start),
@@ -220,39 +285,142 @@ def draw_table(ax):
         )
 
 
-# ---------------------------------------------------------
-# GROUND
-# ---------------------------------------------------------
-
-def draw_ground(ax):
-
-    ax.plot(
-        [-1.0, 1.5],
-        [0.0, 0.0],
-        [0.0, 0.0],
-        linewidth=2
-    )
-
-
-# ---------------------------------------------------------
-# MAIN
-# ---------------------------------------------------------
+# =========================================================
+# MAIN VIEWER
+# =========================================================
 
 def main():
 
-    motion_path = (
-        "data/samples/material_lift_001.json"
-    )
+    # -----------------------------------------------------
+    # READ COMMAND-LINE ARGUMENT
+    # -----------------------------------------------------
 
-    motion = load_motion(
-        motion_path
-    )
+    args = parse_arguments()
 
-    frames = motion["frames"]
-    fps = motion["fps"]
+    motion_path = Path(
+        args.motion_file
+    )
 
     # -----------------------------------------------------
-    # WINDOW
+    # VALIDATE FILE
+    # -----------------------------------------------------
+
+    if not motion_path.exists():
+
+        print()
+        print("RCON MotionAI")
+        print("-----------------------------")
+        print("ERROR: Motion file not found.")
+        print()
+        print("Requested file:")
+        print(motion_path)
+        print()
+
+        return
+
+    if motion_path.suffix.lower() != ".json":
+
+        print()
+        print("RCON MotionAI")
+        print("-----------------------------")
+        print(
+            "ERROR: Viewer currently expects "
+            "a MotionAI JSON file."
+        )
+        print()
+        print("Requested file:")
+        print(motion_path)
+        print()
+
+        return
+
+    # -----------------------------------------------------
+    # LOAD MOTION
+    # -----------------------------------------------------
+
+    try:
+
+        motion = load_motion(
+            motion_path
+        )
+
+    except json.JSONDecodeError as error:
+
+        print()
+        print("RCON MotionAI")
+        print("-----------------------------")
+        print("ERROR: Invalid JSON file.")
+        print(error)
+        print()
+
+        return
+
+    # -----------------------------------------------------
+    # VALIDATE MOTION DATA
+    # -----------------------------------------------------
+
+    frames = motion.get(
+        "frames",
+        []
+    )
+
+    if not frames:
+
+        print()
+        print("RCON MotionAI")
+        print("-----------------------------")
+        print("ERROR: Motion file contains no frames.")
+        print()
+
+        return
+
+    fps = motion.get(
+        "fps",
+        60
+    )
+
+    activity = motion.get(
+        "activity",
+        "unknown_motion"
+    )
+
+    session_id = motion.get(
+        "session_id",
+        "unknown_session"
+    )
+
+    source = motion.get(
+        "source",
+        "unknown"
+    )
+
+    construction_demo = is_construction_lift(
+        activity
+    )
+
+    print()
+    print("RCON MotionAI")
+    print("-----------------------------")
+    print("Loading motion:")
+    print(motion_path)
+    print()
+    print("Session:", session_id)
+    print(
+        "Activity:",
+        format_activity(activity)
+    )
+    print(
+        "Frames:",
+        len(frames)
+    )
+    print(
+        "FPS:",
+        fps
+    )
+    print()
+
+    # -----------------------------------------------------
+    # CREATE WINDOW
     # -----------------------------------------------------
 
     fig = plt.figure(
@@ -274,7 +442,7 @@ def main():
 
     ax.set_title(
         "RCON MotionAI\n"
-        "Construction Human Motion Prototype",
+        "Human Motion Visualization Prototype",
         fontsize=15,
         pad=20
     )
@@ -283,9 +451,20 @@ def main():
     # 3D WORLD
     # -----------------------------------------------------
 
-    ax.set_xlim(-1.0, 1.5)
-    ax.set_ylim(-0.5, 1.2)
-    ax.set_zlim(0.0, 2.2)
+    ax.set_xlim(
+        -1.0,
+        1.5
+    )
+
+    ax.set_ylim(
+        -0.5,
+        1.2
+    )
+
+    ax.set_zlim(
+        0.0,
+        2.2
+    )
 
     ax.set_xlabel(
         "X - Side Movement"
@@ -308,8 +487,14 @@ def main():
     # ENVIRONMENT
     # -----------------------------------------------------
 
-    draw_ground(ax)
-    draw_table(ax)
+    draw_ground(
+        ax
+    )
+
+    if construction_demo:
+        draw_table(
+            ax
+        )
 
     # -----------------------------------------------------
     # SKELETON
@@ -328,18 +513,25 @@ def main():
             markersize=5
         )
 
-        skeleton_lines.append(line)
+        skeleton_lines.append(
+            line
+        )
 
     # -----------------------------------------------------
-    # MATERIAL
+    # MATERIAL BOX
     # -----------------------------------------------------
 
     box_lines = create_box_lines(
         ax
     )
 
+    if not construction_demo:
+        hide_box(
+            box_lines
+        )
+
     # -----------------------------------------------------
-    # STATUS
+    # STATUS DISPLAY
     # -----------------------------------------------------
 
     status_text = fig.text(
@@ -360,20 +552,29 @@ def main():
     }
 
     # -----------------------------------------------------
-    # UPDATE FRAME
+    # UPDATE ANIMATION
     # -----------------------------------------------------
 
     def update(frame_number):
 
         playback["frame"] = frame_number
 
-        frame = frames[frame_number]
-        joints = frame["joints"]
+        frame = frames[
+            frame_number
+        ]
 
-        timestamp = frame["timestamp"]
+        joints = frame.get(
+            "joints",
+            {}
+        )
+
+        timestamp = frame.get(
+            "timestamp",
+            frame_number / fps
+        )
 
         # -------------------------------------------------
-        # SKELETON
+        # UPDATE SKELETON
         # -------------------------------------------------
 
         for line, (joint_a, joint_b) in zip(
@@ -387,8 +588,27 @@ def main():
             if joint_b not in joints:
                 continue
 
-            a = joints[joint_a]["position"]
-            b = joints[joint_b]["position"]
+            a = joints[
+                joint_a
+            ]["position"]
+
+            b = joints[
+                joint_b
+            ]["position"]
+
+            # MotionAI coordinates:
+            #
+            # [x, y, z]
+            #
+            # x = left / right
+            # y = vertical height
+            # z = forward / backward
+            #
+            # Matplotlib:
+            #
+            # display X = x
+            # display Y = z
+            # display Z = y
 
             xs = [
                 a[0],
@@ -415,112 +635,118 @@ def main():
             )
 
         # -------------------------------------------------
-        # HAND POSITION
+        # CONSTRUCTION MATERIAL
         # -------------------------------------------------
 
-        left_wrist = (
-            joints["left_wrist"]["position"]
-        )
+        if (
+            construction_demo
+            and "left_wrist" in joints
+            and "right_wrist" in joints
+        ):
 
-        right_wrist = (
-            joints["right_wrist"]["position"]
-        )
+            left_wrist = joints[
+                "left_wrist"
+            ]["position"]
 
-        average_hand_x = (
-            left_wrist[0] +
-            right_wrist[0]
-        ) / 2
+            right_wrist = joints[
+                "right_wrist"
+            ]["position"]
 
-        average_hand_y = (
-            left_wrist[1] +
-            right_wrist[1]
-        ) / 2
+            average_hand_x = (
+                left_wrist[0]
+                + right_wrist[0]
+            ) / 2
 
-        average_hand_z = (
-            left_wrist[2] +
-            right_wrist[2]
-        ) / 2
+            average_hand_y = (
+                left_wrist[1]
+                + right_wrist[1]
+            ) / 2
 
-        # -------------------------------------------------
-        # BOX POSITION
-        # -------------------------------------------------
+            average_hand_z = (
+                left_wrist[2]
+                + right_wrist[2]
+            ) / 2
 
-        if timestamp < 1.7:
+            # Material starts on ground
+            if timestamp < 1.7:
 
-            box_x = 0.0
-            box_y = 0.14
-            box_z = 0.38
+                box_x = 0.0
+                box_y = 0.14
+                box_z = 0.38
 
-        elif timestamp < 4.6:
+            # Material follows hands
+            elif timestamp < 4.6:
 
-            box_x = average_hand_x
-            box_y = average_hand_y - 0.10
-            box_z = average_hand_z
+                box_x = average_hand_x
+                box_y = average_hand_y - 0.10
+                box_z = average_hand_z
 
-        elif timestamp < 5.2:
+            # Material placement
+            elif timestamp < 5.2:
 
-            box_x = average_hand_x
+                box_x = average_hand_x
 
-            box_y = max(
-                average_hand_y - 0.10,
-                0.94
+                box_y = max(
+                    average_hand_y - 0.10,
+                    0.94
+                )
+
+                box_z = max(
+                    average_hand_z,
+                    0.52
+                )
+
+            # Material remains on table
+            else:
+
+                box_x = 0.72
+                box_y = 0.94
+                box_z = 0.52
+
+            update_box(
+                box_lines,
+                box_x,
+                box_y,
+                box_z
             )
-
-            box_z = max(
-                average_hand_z,
-                0.52
-            )
-
-        else:
-
-            box_x = 0.72
-            box_y = 0.94
-            box_z = 0.52
-
-        update_box(
-            box_lines,
-            box_x,
-            box_y,
-            box_z
-        )
 
         # -------------------------------------------------
         # MOTION PHASE
         # -------------------------------------------------
 
         phase = get_motion_phase(
+            activity,
             timestamp
         )
 
         # -------------------------------------------------
-        # STATUS DISPLAY
+        # STATUS
         # -------------------------------------------------
 
         status_text.set_text(
             "RCON MotionAI\n"
             "-----------------------------\n"
-            f"Task: "
-            f"{format_activity(motion['activity'])}\n"
+            f"Task: {format_activity(activity)}\n"
             f"Phase: {phase}\n"
-            f"Source: "
-            f"{motion['source'].title()} Prototype\n"
-            f"Session: {motion['session_id']}\n"
-            f"Frame: "
-            f"{frame_number + 1} / {len(frames)}\n"
+            f"Source: {source.title()}\n"
+            f"Session: {session_id}\n"
+            f"Frame: {frame_number + 1} / {len(frames)}\n"
             f"Time: {timestamp:.2f} sec"
         )
 
         return (
-            skeleton_lines +
-            box_lines +
-            [status_text]
+            skeleton_lines
+            + box_lines
+            + [status_text]
         )
 
     # -----------------------------------------------------
     # ANIMATION
     # -----------------------------------------------------
 
-    interval_ms = 1000 / fps
+    interval_ms = (
+        1000 / fps
+    )
 
     animation = FuncAnimation(
         fig,
@@ -532,15 +758,25 @@ def main():
     )
 
     # -----------------------------------------------------
-    # BUTTONS
+    # BUTTON AREA
     # -----------------------------------------------------
 
     play_pause_ax = fig.add_axes(
-        [0.40, 0.05, 0.12, 0.055]
+        [
+            0.40,
+            0.05,
+            0.12,
+            0.055
+        ]
     )
 
     restart_ax = fig.add_axes(
-        [0.54, 0.05, 0.12, 0.055]
+        [
+            0.54,
+            0.05,
+            0.12,
+            0.055
+        ]
     )
 
     play_pause_button = Button(
@@ -557,7 +793,7 @@ def main():
     # PLAY / PAUSE
     # -----------------------------------------------------
 
-    def toggle_playback(event):
+    def toggle_playback(event=None):
 
         if playback["paused"]:
 
@@ -585,22 +821,20 @@ def main():
     # RESTART
     # -----------------------------------------------------
 
-    def restart_animation(event):
+    def restart_animation(event=None):
 
-        # Reset FuncAnimation sequence
         animation.frame_seq = (
             animation.new_frame_seq()
         )
 
         playback["frame"] = 0
 
-        # Immediately redraw frame zero
-        update(0)
+        update(
+            0
+        )
 
         fig.canvas.draw_idle()
 
-        # If animation is currently playing,
-        # restart its timer as well.
         if not playback["paused"]:
 
             animation.event_source.stop()
@@ -619,25 +853,31 @@ def main():
     )
 
     # -----------------------------------------------------
-    # KEYBOARD SHORTCUT
+    # KEYBOARD CONTROLS
     # -----------------------------------------------------
 
     def keyboard_controls(event):
 
-        # Space = Play/Pause
         if event.key == " ":
-            toggle_playback(event)
 
-        # R = Restart
-        elif event.key.lower() == "r":
-            restart_animation(event)
+            toggle_playback()
+
+        elif (
+            event.key
+            and event.key.lower() == "r"
+        ):
+
+            restart_animation()
 
     fig.canvas.mpl_connect(
         "key_press_event",
         keyboard_controls
     )
 
-    # Keep enough space for controls
+    # -----------------------------------------------------
+    # DISPLAY
+    # -----------------------------------------------------
+
     plt.subplots_adjust(
         left=0.08,
         right=0.95,
@@ -648,9 +888,9 @@ def main():
     plt.show()
 
 
-# ---------------------------------------------------------
-# START
-# ---------------------------------------------------------
+# =========================================================
+# START PROGRAM
+# =========================================================
 
 if __name__ == "__main__":
     main()
