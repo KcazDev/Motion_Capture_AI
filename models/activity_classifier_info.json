@@ -1,0 +1,17 @@
+{
+  "model": "RandomForestClassifier",
+  "version": "0.1",
+  "training_samples": 20,
+  "testing_samples": 5,
+  "feature_count": 415,
+  "classes": [
+    "box_carry",
+    "box_lift",
+    "hammer_strike",
+    "material_place",
+    "overhead_work"
+  ],
+  "accuracy": 1.0,
+  "random_state": 42,
+  "n_estimators": 500
+}
