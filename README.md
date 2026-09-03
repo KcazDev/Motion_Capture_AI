@@ -478,3 +478,211 @@ A central question behind MotionAI is:
 ## RCON MotionAI
 
 **Capturing Human Skill. Building Machine Intelligence.**
+
+---
+
+# MotionAI v0.2 - September 3, 2026
+
+## Major Milestone: Real Motion AI Pipeline Completed
+
+MotionAI has progressed from a synthetic motion-processing prototype into a working end-to-end motion intelligence system using real Rokoko motion-capture data.
+
+### Completed Today
+
+- [x] Connected and calibrated Rokoko motion-capture suit
+- [x] Connected and calibrated Rokoko Smartgloves
+- [x] Captured real construction-task motion recordings
+- [x] Exported real Rokoko recordings as FBX
+- [x] Built Blender-based FBX-to-MotionAI conversion pipeline
+- [x] Preserved full skeletal data including hand/finger motion
+- [x] Built automated batch conversion for Rokoko datasets
+- [x] Built dataset validation and health-check tooling
+- [x] Successfully visualized real construction motion in the MotionAI 3D viewer
+- [x] Built machine-learning feature extraction pipeline
+- [x] Generated 415 movement features per recording
+- [x] Created a 25-recording construction-motion pilot dataset
+- [x] Trained first MotionAI construction activity classifier
+- [x] Added individual motion-file inference
+- [x] Added five-fold stratified cross-validation evaluation
+- [x] Achieved 100% out-of-fold accuracy in the initial single-actor pilot study
+
+## Current Pipeline
+
+Human Construction Activity
+        |
+        v
+Rokoko Suit + Smartgloves
+        |
+        v
+Rokoko Studio
+        |
+        v
+Raw FBX Recording
+        |
+        v
+Blender Motion Extraction
+        |
+        v
+MotionAI Standard JSON
+        |
+        +----------------------+
+        |                      |
+        v                      v
+3D Visualization       Feature Extraction
+                               |
+                               v
+                     415 Motion Features
+                               |
+                               v
+                    Random Forest Model
+                               |
+                               v
+                 Construction Activity
+                       Recognition
+
+## Initial Pilot Dataset
+
+The current pilot dataset contains 25 real Rokoko motion-capture recordings across five construction activities.
+
+| Activity | Recordings |
+| --- | ---: |
+| Box Carry | 5 |
+| Box Lift | 5 |
+| Hammer Strike | 5 |
+| Material Place | 5 |
+| Overhead Work | 5 |
+| **Total** | **25** |
+
+The source recordings contain approximately 75 skeletal bones per frame, including Smartglove hand and finger data.
+
+## Machine Learning
+
+MotionAI currently converts each recording into a fixed-length feature vector containing:
+
+- Root-centered skeletal position information
+- Body-scale normalized movement
+- Joint position statistics
+- Joint movement ranges
+- Joint velocity statistics
+- Maximum joint velocities
+- Whole-body displacement
+- Whole-body movement range
+- Recording duration
+
+Each recording currently produces:
+
+**415 machine-learning features**
+
+The first baseline model is a:
+
+**Random Forest Classifier**
+
+It recognizes:
+
+- Box Carry
+- Box Lift
+- Hammer Strike
+- Material Place
+- Overhead Work
+
+## Five-Fold Cross-Validation Results
+
+The 25-recording dataset was evaluated using five-fold stratified cross-validation.
+
+Every recording was excluded from training and used as unseen test data exactly once.
+
+| Metric | Result |
+| --- | ---: |
+| Samples | 25 |
+| Classes | 5 |
+| Features per Sample | 415 |
+| Mean Fold Accuracy | **100.00%** |
+| Overall Out-of-Fold Accuracy | **100.00%** |
+| Standard Deviation | **0.00%** |
+| Average Prediction Confidence | **83.96%** |
+| Correct Predictions | **25 / 25** |
+| Misclassifications | **0** |
+
+### Per-Class Results
+
+| Activity | Accuracy |
+| --- | ---: |
+| Box Carry | 100% |
+| Box Lift | 100% |
+| Hammer Strike | 100% |
+| Material Place | 100% |
+| Overhead Work | 100% |
+
+## Example MotionAI Inference
+
+Example input:
+
+hammer_strike_005.json
+
+Output:
+
+Predicted Activity: Hammer Strike
+
+Confidence: 96.40%
+
+## Research Interpretation
+
+The current results represent an initial single-actor pilot study.
+
+The results demonstrate that MotionAI can distinguish the five recorded construction activities within the current dataset.
+
+The 100% result should not yet be interpreted as 100% accuracy across arbitrary workers, environments, or construction scenarios.
+
+The next validation phase will introduce additional participants and test whether MotionAI can recognize construction activities performed by workers who were not included during model training.
+
+## Current R-CON Prototype
+
+The current working prototype demonstrates:
+
+**Capture -> Convert -> Visualize -> Analyze -> Classify**
+
+### Potential Applications
+
+- Construction task recognition
+- Workforce training
+- Skilled-worker knowledge capture
+- Apprentice vs. expert movement comparison
+- Ergonomic analysis
+- Safety analysis
+- Workflow analysis
+- Digital twins
+- Human-machine collaboration
+- Future construction robotics research
+
+## Next Development Milestones
+
+### Near Term
+
+- [ ] Prospective testing on newly captured recordings
+- [ ] Multi-participant data collection
+- [ ] Person-independent model evaluation
+- [ ] Expanded construction activity library
+- [ ] Smartglove-specific grip analysis
+- [ ] Improved visualization of AI predictions
+
+### Future Research
+
+- [ ] Real-time Rokoko streaming
+- [ ] Real-time construction activity recognition
+- [ ] Ergonomic and safety scoring
+- [ ] Expert-vs-novice comparison
+- [ ] Avatar retargeting
+- [ ] Construction-worker digital twins
+- [ ] Temporal neural-network models
+- [ ] Human-to-robot motion retargeting
+- [ ] Imitation learning
+- [ ] Construction robotics integration
+
+Physical robot control is a future research direction and is not part of the current MotionAI prototype.
+
+## Current Research Question
+
+**Can human construction motion captured through wearable motion-capture technology be transformed into standardized machine-readable data that enables AI systems to recognize and eventually learn skilled physical tasks?**
+
+The current MotionAI v0.2 prototype demonstrates that the capture, conversion, visualization, feature-extraction, and construction-activity-recognition portions of this pipeline are now operational.
+
