@@ -1,0 +1,308 @@
+{
+  "evaluation": "5-fold stratified cross-validation",
+  "samples": 25,
+  "feature_count": 415,
+  "classes": [
+    "box_carry",
+    "box_lift",
+    "hammer_strike",
+    "material_place",
+    "overhead_work"
+  ],
+  "folds": 5,
+  "fold_accuracies": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "mean_fold_accuracy": 1.0,
+  "std_fold_accuracy": 0.0,
+  "overall_out_of_fold_accuracy": 1.0,
+  "average_confidence": 0.8396000000000001,
+  "confusion_matrix": [
+    [
+      5,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      5,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      5,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      5,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      5
+    ]
+  ],
+  "classification_report": {
+    "box_carry": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5.0
+    },
+    "box_lift": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5.0
+    },
+    "hammer_strike": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5.0
+    },
+    "material_place": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5.0
+    },
+    "overhead_work": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 25.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 25.0
+    }
+  },
+  "predictions": [
+    {
+      "fold": 1,
+      "file": "box_carry_004.json",
+      "actual": "box_carry",
+      "predicted": "box_carry",
+      "confidence": 0.758,
+      "correct": true
+    },
+    {
+      "fold": 1,
+      "file": "box_lift_004.json",
+      "actual": "box_lift",
+      "predicted": "box_lift",
+      "confidence": 0.864,
+      "correct": true
+    },
+    {
+      "fold": 1,
+      "file": "hammer_strike_002.json",
+      "actual": "hammer_strike",
+      "predicted": "hammer_strike",
+      "confidence": 0.864,
+      "correct": true
+    },
+    {
+      "fold": 1,
+      "file": "material_place_001.json",
+      "actual": "material_place",
+      "predicted": "material_place",
+      "confidence": 0.75,
+      "correct": true
+    },
+    {
+      "fold": 1,
+      "file": "overhead_work_001.json",
+      "actual": "overhead_work",
+      "predicted": "overhead_work",
+      "confidence": 0.738,
+      "correct": true
+    },
+    {
+      "fold": 2,
+      "file": "box_carry_001.json",
+      "actual": "box_carry",
+      "predicted": "box_carry",
+      "confidence": 0.868,
+      "correct": true
+    },
+    {
+      "fold": 2,
+      "file": "box_lift_002.json",
+      "actual": "box_lift",
+      "predicted": "box_lift",
+      "confidence": 0.918,
+      "correct": true
+    },
+    {
+      "fold": 2,
+      "file": "hammer_strike_001.json",
+      "actual": "hammer_strike",
+      "predicted": "hammer_strike",
+      "confidence": 0.884,
+      "correct": true
+    },
+    {
+      "fold": 2,
+      "file": "material_place_002.json",
+      "actual": "material_place",
+      "predicted": "material_place",
+      "confidence": 0.846,
+      "correct": true
+    },
+    {
+      "fold": 2,
+      "file": "overhead_work_004.json",
+      "actual": "overhead_work",
+      "predicted": "overhead_work",
+      "confidence": 0.854,
+      "correct": true
+    },
+    {
+      "fold": 3,
+      "file": "box_carry_003.json",
+      "actual": "box_carry",
+      "predicted": "box_carry",
+      "confidence": 0.876,
+      "correct": true
+    },
+    {
+      "fold": 3,
+      "file": "box_lift_003.json",
+      "actual": "box_lift",
+      "predicted": "box_lift",
+      "confidence": 0.872,
+      "correct": true
+    },
+    {
+      "fold": 3,
+      "file": "hammer_strike_005.json",
+      "actual": "hammer_strike",
+      "predicted": "hammer_strike",
+      "confidence": 0.89,
+      "correct": true
+    },
+    {
+      "fold": 3,
+      "file": "material_place_003.json",
+      "actual": "material_place",
+      "predicted": "material_place",
+      "confidence": 0.758,
+      "correct": true
+    },
+    {
+      "fold": 3,
+      "file": "overhead_work_002.json",
+      "actual": "overhead_work",
+      "predicted": "overhead_work",
+      "confidence": 0.822,
+      "correct": true
+    },
+    {
+      "fold": 4,
+      "file": "box_carry_005.json",
+      "actual": "box_carry",
+      "predicted": "box_carry",
+      "confidence": 0.818,
+      "correct": true
+    },
+    {
+      "fold": 4,
+      "file": "box_lift_001.json",
+      "actual": "box_lift",
+      "predicted": "box_lift",
+      "confidence": 0.928,
+      "correct": true
+    },
+    {
+      "fold": 4,
+      "file": "hammer_strike_003.json",
+      "actual": "hammer_strike",
+      "predicted": "hammer_strike",
+      "confidence": 0.894,
+      "correct": true
+    },
+    {
+      "fold": 4,
+      "file": "material_place_004.json",
+      "actual": "material_place",
+      "predicted": "material_place",
+      "confidence": 0.766,
+      "correct": true
+    },
+    {
+      "fold": 4,
+      "file": "overhead_work_003.json",
+      "actual": "overhead_work",
+      "predicted": "overhead_work",
+      "confidence": 0.878,
+      "correct": true
+    },
+    {
+      "fold": 5,
+      "file": "box_carry_002.json",
+      "actual": "box_carry",
+      "predicted": "box_carry",
+      "confidence": 0.756,
+      "correct": true
+    },
+    {
+      "fold": 5,
+      "file": "box_lift_005.json",
+      "actual": "box_lift",
+      "predicted": "box_lift",
+      "confidence": 0.826,
+      "correct": true
+    },
+    {
+      "fold": 5,
+      "file": "hammer_strike_004.json",
+      "actual": "hammer_strike",
+      "predicted": "hammer_strike",
+      "confidence": 0.91,
+      "correct": true
+    },
+    {
+      "fold": 5,
+      "file": "material_place_005.json",
+      "actual": "material_place",
+      "predicted": "material_place",
+      "confidence": 0.768,
+      "correct": true
+    },
+    {
+      "fold": 5,
+      "file": "overhead_work_005.json",
+      "actual": "overhead_work",
+      "predicted": "overhead_work",
+      "confidence": 0.884,
+      "correct": true
+    }
+  ]
+}
