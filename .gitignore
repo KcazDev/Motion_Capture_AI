@@ -20,3 +20,6 @@ Thumbs.db
 
 # Logs
 *.log
+# Webcam demo environment and downloaded model
+.venv-camera/
+models/pose_landmarker_lite.task

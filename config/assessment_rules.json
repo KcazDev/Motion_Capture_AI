@@ -1,0 +1,19 @@
+{
+  "confidence": 0.65,
+  "ready_hold_seconds": 0.6,
+  "upright_knee_degrees": 155,
+  "upright_torso_degrees": 25,
+  "bend_knee_degrees": 145,
+  "bend_torso_degrees": 35,
+  "start_hold_seconds": 0.2,
+  "wrist_rise_torso_lengths": 0.3,
+  "finish_hold_seconds": 0.5,
+  "max_lift_seconds": 15,
+  "min_lift_seconds": 0.6,
+  "max_tracking_gap_seconds": 0.25,
+  "min_samples": 8,
+  "max_torso_degrees": 55,
+  "max_reach_torso_lengths": 1.2,
+  "max_speed_torso_lengths_per_second": 3.0,
+  "min_knee_bend_degrees": 20
+}
