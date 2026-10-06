@@ -1,0 +1,3 @@
+# Separate environment keeps the existing Rokoko dependencies intact.
+mediapipe==1.0.1
+opencv-contrib-python==5.0.0.93
